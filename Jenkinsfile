@@ -26,8 +26,9 @@ pipeline {
             }
         }
 
-        stage('Print Info') {
-            steps {
+    stage('Print Info') {
+        steps {
+            script {
                 echo "Branch: ${env.BRANCH_NAME}"
                 if (env.CHANGE_ID) {
                     echo "PR #${env.CHANGE_ID} for branch ${env.CHANGE_TARGET}"
@@ -36,4 +37,5 @@ pipeline {
             }
         }
     }
+
 }
