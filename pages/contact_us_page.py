@@ -1,7 +1,6 @@
 """
 Page object for the Contact Us page.
 """
-from typing import Optional
 
 from playwright.sync_api import Page
 
@@ -12,36 +11,45 @@ from utilities.logger import logger
 
 class ContactUsPage(BasePage):
     """Page object representing the Contact Us page."""
-    
-    # Selectors for the page elements
-    _FIRST_NAME_FIELD = 'input[name="first_name"]'
-    _LAST_NAME_FIELD = 'input[name="last_name"]'
-    _EMAIL_FIELD = 'input[name="email"]'
-    _COMMENT_FIELD = 'textarea[name="message"]'
-    _SUBMIT_BUTTON = 'input[type="submit"]'
-    _RESET_BUTTON = 'input[type="reset"]'
-    _SUCCESS_MESSAGE = 'div#contact_reply h1'
-    _ERROR_MESSAGE = 'body'
-    
+
+    # Field names kept for test compatibility
+    _FIRST_NAME_FIELD = "First Name"
+    _LAST_NAME_FIELD = "Last Name"
+    _EMAIL_FIELD = "Email Address"
+    _COMMENT_FIELD = "Comments"
+
+    # Button names
+    _SUBMIT_BUTTON = "SUBMIT"
+    _RESET_BUTTON = "RESET"
+
+    # Message text
+    _SUCCESS_MESSAGE = "Thank You for your Message!"
+
     def __init__(self, page: Page):
         """
         Initialize the Contact Us page.
-        
+
         Args:
             page: Playwright page object.
         """
         super().__init__(page)
         self.url = PAGE_URLS["contact_us"]
-    
+
     def navigate(self) -> None:
         """Navigate to the Contact Us page."""
         logger.info(f"Navigating to Contact Us page: {self.url}")
         self.navigate_to(self.url)
-    
-    def fill_contact_form(self, first_name: str, last_name: str, email: str, comment: str) -> None:
+
+    def fill_contact_form(
+        self,
+        first_name: str,
+        last_name: str,
+        email: str,
+        comment: str,
+    ) -> None:
         """
         Fill in the contact form.
-        
+
         Args:
             first_name: First name to enter.
             last_name: Last name to enter.
@@ -49,62 +57,79 @@ class ContactUsPage(BasePage):
             comment: Comment to enter.
         """
         logger.info("Filling contact form")
-        
-        self.fill_text(self._FIRST_NAME_FIELD, first_name)
-        self.fill_text(self._LAST_NAME_FIELD, last_name)
-        self.fill_text(self._EMAIL_FIELD, email)
-        self.fill_text(self._COMMENT_FIELD, comment)
-    
+
+        self.page.get_by_placeholder(self._FIRST_NAME_FIELD).fill(first_name)
+        self.page.get_by_placeholder(self._LAST_NAME_FIELD).fill(last_name)
+        self.page.get_by_placeholder(self._EMAIL_FIELD).fill(email)
+        self.page.get_by_placeholder(self._COMMENT_FIELD).fill(comment)
+
     def submit_form(self) -> None:
         """Submit the contact form."""
         logger.info("Submitting contact form")
-        self.click(self._SUBMIT_BUTTON)
-    
+        self.page.get_by_role("button", name=self._SUBMIT_BUTTON).click()
+
     def reset_form(self) -> None:
         """Reset the contact form."""
         logger.info("Resetting contact form")
-        self.click(self._RESET_BUTTON)
-    
+        self.page.get_by_role("button", name=self._RESET_BUTTON).click()
+
     def get_success_message(self) -> str:
         """
         Get the success message after form submission.
-        
+
         Returns:
             str: The success message text.
         """
         logger.info("Getting success message")
-        return self.get_text(self._SUCCESS_MESSAGE)
-    
+
+        message = self.page.get_by_role(
+            "heading",
+            name=self._SUCCESS_MESSAGE,
+        ).text_content()
+
+        return message.strip() if message else ""
+
     def is_success_message_displayed(self) -> bool:
         """
         Check if the success message is displayed.
-        
+
         Returns:
             bool: True if displayed, False otherwise.
         """
         logger.info("Checking if success message is displayed")
-        return self.is_visible(self._SUCCESS_MESSAGE)
-    
+
+        return self.page.get_by_role(
+            "heading",
+            name=self._SUCCESS_MESSAGE,
+        ).is_visible()
+
     def get_error_message(self) -> str:
         """
         Get the error message when form submission fails.
-        
+
         Returns:
             str: The error message text.
         """
         logger.info("Getting error message")
-        return self.get_text(self._ERROR_MESSAGE)
-    
+
+        # The WebDriverUniversity error page renders the validation error as
+        # plain body text, not as a labelled alert or heading.
+        error_message = self.page.locator("body").text_content()
+
+        return error_message.strip() if error_message else ""
+
     def is_field_empty(self, field_selector: str) -> bool:
         """
         Check if a field is empty.
-        
+
         Args:
-            field_selector: Selector for the field.
-            
+            field_selector: Field placeholder text.
+
         Returns:
             bool: True if empty, False otherwise.
         """
         logger.info(f"Checking if field is empty: {field_selector}")
-        value = self.get_attribute(field_selector, "value")
-        return not value 
+
+        value = self.page.get_by_placeholder(field_selector).input_value()
+
+        return not value
