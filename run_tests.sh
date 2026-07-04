@@ -104,7 +104,7 @@ elif [ -n "$MODULE" ]; then
 fi
 
 # Add browser option
-PYTEST_CMD="$PYTEST_CMD --browser-name=$BROWSER"
+PYTEST_CMD="$PYTEST_CMD --browser $BROWSER"
 
 # Add headless option if needed
 if [ "$HEADLESS" = true ]; then
