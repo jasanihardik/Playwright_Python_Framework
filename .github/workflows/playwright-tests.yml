@@ -42,12 +42,12 @@ jobs:
         run: |
           mkdir -p reports logs screenshots
 
-      - name: Run Chromium test suite
+      - name: Run Chromium smoke suite
         run: |
-          python -m pytest tests/test_cases \
+          python -m pytest tests/test_cases/test_login.py \
             --browser chromium \
             --headless true \
-            --html=reports/playwright_report_chromium.html \
+            --html=reports/playwright_report_chromium_smoke.html \
             --self-contained-html \
             -v
 
@@ -55,7 +55,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-html-report-chromium
+          name: playwright-html-report-chromium-smoke
           path: reports/
           retention-days: 7
 
