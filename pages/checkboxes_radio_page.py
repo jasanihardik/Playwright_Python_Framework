@@ -6,7 +6,7 @@ Checkboxes and Radio Buttons Page Object for WebDriverUniversity.
 """
 
 import logging
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from playwright.sync_api import Locator, Page
 
@@ -20,188 +20,135 @@ class CheckboxesRadioPage(BasePage):
     """
     Page Object for the Checkboxes and Radio Buttons page.
 
-    This page object uses Playwright role-based and label-based locators
-    instead of raw CSS selectors wherever the demo page exposes usable
-    accessibility information.
-
     URL:
         https://webdriveruniversity.com/Dropdown-Checkboxes-RadioButtons/index.html
     """
 
+    # Page URL
     _URL = "https://webdriveruniversity.com/Dropdown-Checkboxes-RadioButtons/index.html"
 
-    _PAGE_TITLE_TEXT = "Dropdown Menu(s), Checkboxe(s) & Radio Button(s)"
-    _CHECKBOX_HEADER_TEXT = "Checkboxe(s)"
-    _RADIO_BUTTON_HEADER_TEXT = "Radio Button(s)"
-    _SELECTED_DISABLED_HEADER_TEXT = "Selected & Disabled"
-    _FRUIT_DROPDOWN_HEADER_TEXT = "Dropdown Menu(s)"
+    # Page text
+    _PAGE_TITLE = "Dropdown Menu(s), Checkboxe(s) & Radio Button(s)"
+    _CHECKBOX_HEADER = "Checkboxe(s)"
+    _RADIO_BUTTON_HEADER = "Radio Button(s)"
+    _SELECTED_DISABLED_HEADER = "Selected & Disabled"
+    _FRUIT_DROPDOWN_HEADER = "Dropdown Menu(s)"
 
-    _CHECKBOX_LABELS: Dict[int, str] = {
-        1: "Option 1",
-        2: "Option 2",
-        3: "Option 3",
-        4: "Option 4",
-    }
+    # Checkbox indexes
+    _CHECKBOX_1 = 0
+    _CHECKBOX_2 = 1
+    _CHECKBOX_3 = 2
+    _CHECKBOX_4 = 3
 
-    _COLOR_RADIO_INDEXES: Dict[str, int] = {
-        "green": 0,
-        "blue": 1,
-        "yellow": 2,
-        "orange": 3,
-        "purple": 4,
-    }
+    # Color radio indexes
+    _RADIO_GREEN = 0
+    _RADIO_BLUE = 1
+    _RADIO_YELLOW = 2
+    _RADIO_ORANGE = 3
+    _RADIO_PURPLE = 4
 
-    _VEGETABLE_RADIO_INDEXES: Dict[str, int] = {
-        "lettuce": 5,
-        "cabbage": 6,
-        "pumpkin": 7,
-    }
+    # Vegetable radio indexes
+    _RADIO_LETTUCE = 5
+    _RADIO_CABBAGE = 6
+    _RADIO_PUMPKIN = 7
+
+    # Fruit dropdown index
+    _FRUIT_DROPDOWN = 3
 
     def __init__(self, page: Page) -> None:
         """
         Initialize the Checkboxes and Radio Buttons page object.
 
         Args:
-            page: Playwright page instance.
+            page: Playwright page object.
         """
         super().__init__(page)
-
-        self.page_title: Locator = self.page.get_by_role(
-            "heading",
-            name=self._PAGE_TITLE_TEXT,
-            exact=True,
-        )
-
-        self.checkbox_header: Locator = self.page.get_by_role(
-            "heading",
-            name=self._CHECKBOX_HEADER_TEXT,
-            exact=True,
-        )
-
-        self.radio_button_header: Locator = self.page.get_by_role(
-            "heading",
-            name=self._RADIO_BUTTON_HEADER_TEXT,
-            exact=True,
-        )
-
-        self.selected_disabled_header: Locator = self.page.get_by_role(
-            "heading",
-            name=self._SELECTED_DISABLED_HEADER_TEXT,
-            exact=True,
-        )
-
-        self.fruit_dropdown_header: Locator = self.page.get_by_role(
-            "heading",
-            name=self._FRUIT_DROPDOWN_HEADER_TEXT,
-            exact=True,
-        )
-
-        self.checkboxes: Locator = self.page.get_by_role("checkbox")
-        self.radio_buttons: Locator = self.page.get_by_role("radio")
-        self.fruit_dropdown: Locator = self.page.get_by_role("combobox").nth(3)
 
     def navigate(self) -> None:
         """
         Navigate to the Checkboxes and Radio Buttons page.
         """
-        logger.info("Navigating to Checkboxes and Radio Buttons page: %s", self._URL)
+        logger.info(f"Navigating to Checkboxes and Radio Buttons page: {self._URL}")
         super().navigate_to(self._URL)
 
     def get_page_title(self) -> str:
         """
-        Get the main page heading text.
+        Get the page title text.
 
         Returns:
-            Main page heading text.
+            str: The page title text.
         """
         logger.info("Getting page title")
-        return self._get_text_content(self.page_title)
+
+        title = self.page.get_by_role(
+            "heading",
+            name=self._PAGE_TITLE,
+            exact=True,
+        )
+
+        text = title.text_content()
+        return text.strip() if text else ""
 
     def get_checkbox_header(self) -> str:
         """
         Get the checkbox section header text.
 
         Returns:
-            Checkbox section header text.
+            str: The checkbox section header text.
         """
         logger.info("Getting checkbox header text")
-        return self._get_text_content(self.checkbox_header)
 
-    def get_radio_button_header(self) -> str:
-        """
-        Get the radio button section header text.
+        header = self.page.get_by_role(
+            "heading",
+            name=self._CHECKBOX_HEADER,
+            exact=True,
+        )
 
-        Returns:
-            Radio button section header text.
-        """
-        logger.info("Getting radio button header text")
-        return self._get_text_content(self.radio_button_header)
-
-    def get_selected_disabled_header(self) -> str:
-        """
-        Get the selected and disabled section header text.
-
-        Returns:
-            Selected and disabled section header text.
-        """
-        logger.info("Getting selected and disabled header text")
-        return self._get_text_content(self.selected_disabled_header)
-
-    def get_fruit_dropdown_header(self) -> str:
-        """
-        Get the fruit dropdown section header text.
-
-        Returns:
-            Fruit dropdown section header text.
-        """
-        logger.info("Getting fruit dropdown header text")
-        return self._get_text_content(self.fruit_dropdown_header)
+        text = header.text_content()
+        return text.strip() if text else ""
 
     def is_checkbox_checked(self, checkbox_number: int) -> bool:
         """
-        Check whether a checkbox is selected.
+        Check if a checkbox is checked.
 
         Args:
-            checkbox_number: Checkbox number from 1 to 4.
+            checkbox_number: The checkbox number from 1 to 4.
 
         Returns:
-            True if the checkbox is selected, otherwise False.
-
-        Raises:
-            ValueError: If the checkbox number is invalid.
+            bool: True if the checkbox is checked, False otherwise.
         """
-        logger.info("Checking if checkbox %s is checked", checkbox_number)
-        return self._get_checkbox(checkbox_number).is_checked()
+        checkbox_index = getattr(self, f"_CHECKBOX_{checkbox_number}")
+        logger.info(f"Checking if checkbox {checkbox_number} is checked")
+
+        return self.page.get_by_role("checkbox").nth(checkbox_index).is_checked()
 
     def check_checkbox(self, checkbox_number: int) -> None:
         """
-        Select a checkbox if it is not already selected.
+        Check a checkbox if it is not already checked.
 
         Args:
-            checkbox_number: Checkbox number from 1 to 4.
-
-        Raises:
-            ValueError: If the checkbox number is invalid.
+            checkbox_number: The checkbox number from 1 to 4.
         """
-        logger.info("Checking checkbox %s", checkbox_number)
+        checkbox_index = getattr(self, f"_CHECKBOX_{checkbox_number}")
+        logger.info(f"Checking checkbox {checkbox_number}")
 
-        checkbox = self._get_checkbox(checkbox_number)
+        checkbox = self.page.get_by_role("checkbox").nth(checkbox_index)
+
         if not checkbox.is_checked():
             checkbox.check()
 
     def uncheck_checkbox(self, checkbox_number: int) -> None:
         """
-        Clear a checkbox if it is currently selected.
+        Uncheck a checkbox if it is checked.
 
         Args:
-            checkbox_number: Checkbox number from 1 to 4.
-
-        Raises:
-            ValueError: If the checkbox number is invalid.
+            checkbox_number: The checkbox number from 1 to 4.
         """
-        logger.info("Unchecking checkbox %s", checkbox_number)
+        checkbox_index = getattr(self, f"_CHECKBOX_{checkbox_number}")
+        logger.info(f"Unchecking checkbox {checkbox_number}")
 
-        checkbox = self._get_checkbox(checkbox_number)
+        checkbox = self.page.get_by_role("checkbox").nth(checkbox_index)
+
         if checkbox.is_checked():
             checkbox.uncheck()
 
@@ -210,14 +157,13 @@ class CheckboxesRadioPage(BasePage):
         Toggle a checkbox state.
 
         Args:
-            checkbox_number: Checkbox number from 1 to 4.
-
-        Raises:
-            ValueError: If the checkbox number is invalid.
+            checkbox_number: The checkbox number from 1 to 4.
         """
-        logger.info("Toggling checkbox %s", checkbox_number)
+        checkbox_index = getattr(self, f"_CHECKBOX_{checkbox_number}")
+        logger.info(f"Toggling checkbox {checkbox_number}")
 
-        checkbox = self._get_checkbox(checkbox_number)
+        checkbox = self.page.get_by_role("checkbox").nth(checkbox_index)
+
         if checkbox.is_checked():
             checkbox.uncheck()
         else:
@@ -225,248 +171,294 @@ class CheckboxesRadioPage(BasePage):
 
     def get_all_checkboxes_state(self) -> Dict[str, bool]:
         """
-        Get the selected state of all checkboxes.
+        Get the state of all checkboxes.
 
         Returns:
-            Dictionary containing checkbox names and their selected states.
+            Dict[str, bool]: Dictionary with checkbox numbers as keys and their checked state as values.
         """
         logger.info("Getting state of all checkboxes")
 
-        return {
-            f"checkbox_{checkbox_number}": self.is_checkbox_checked(checkbox_number)
-            for checkbox_number in self._CHECKBOX_LABELS
-        }
+        states = {}
+
+        for checkbox_number in range(1, 5):
+            states[f"checkbox_{checkbox_number}"] = self.is_checkbox_checked(
+                checkbox_number,
+            )
+
+        return states
+
+    def get_radio_button_header(self) -> str:
+        """
+        Get the radio button section header text.
+
+        Returns:
+            str: The radio button section header text.
+        """
+        logger.info("Getting radio button header text")
+
+        header = self.page.get_by_role(
+            "heading",
+            name=self._RADIO_BUTTON_HEADER,
+            exact=True,
+        )
+
+        text = header.text_content()
+        return text.strip() if text else ""
 
     def select_radio_button(self, color: str) -> None:
         """
-        Select a color radio button.
+        Select a radio button by color.
 
         Args:
-            color: Color radio option to select.
-                Supported values: green, blue, yellow, orange, purple.
-
-        Raises:
-            ValueError: If the color is invalid.
+            color: The color to select. Supported values are green, blue, yellow, orange, and purple.
         """
-        normalized_color = color.lower()
-        logger.info("Selecting color radio button: %s", normalized_color)
+        radio_index = getattr(self, f"_RADIO_{color.upper()}")
+        logger.info(f"Selecting radio button: {color}")
 
-        self._get_color_radio(normalized_color).check()
+        self.page.get_by_role("radio").nth(radio_index).check()
 
     def get_selected_radio_button(self) -> str:
         """
-        Get the selected color radio button.
+        Get the selected radio button color.
 
         Returns:
-            Selected color value, or an empty string if none is selected.
+            str: The selected radio button color or empty string if none is selected.
         """
-        logger.info("Getting selected color radio button")
+        logger.info("Getting selected radio button")
 
-        for color in self._COLOR_RADIO_INDEXES:
-            if self._get_color_radio(color).is_checked():
+        colors = ["green", "blue", "yellow", "orange", "purple"]
+
+        for color in colors:
+            radio_index = getattr(self, f"_RADIO_{color.upper()}")
+
+            if self.page.get_by_role("radio").nth(radio_index).is_checked():
                 return color
 
         return ""
 
-    def is_radio_disabled(self, vegetable: str) -> bool:
+    def get_selected_disabled_header(self) -> str:
         """
-        Check whether a vegetable radio button is disabled.
-
-        Args:
-            vegetable: Vegetable radio option to check.
-                Supported values: lettuce, cabbage, pumpkin.
+        Get the selected and disabled section header text.
 
         Returns:
-            True if the radio button is disabled, otherwise False.
-
-        Raises:
-            ValueError: If the vegetable name is invalid.
+            str: The selected and disabled section header text.
         """
-        normalized_vegetable = vegetable.lower()
-        logger.info(
-            "Checking if vegetable radio button is disabled: %s",
-            normalized_vegetable,
+        logger.info("Getting selected and disabled header text")
+
+        header = self.page.get_by_role(
+            "heading",
+            name=self._SELECTED_DISABLED_HEADER,
+            exact=True,
         )
 
-        return self._get_vegetable_radio(normalized_vegetable).is_disabled()
+        text = header.text_content()
+        return text.strip() if text else ""
+
+    def is_radio_disabled(self, vegetable: str) -> bool:
+        """
+        Check if a vegetable radio button is disabled.
+
+        Args:
+            vegetable: The vegetable to check. Supported values are lettuce, cabbage, and pumpkin.
+
+        Returns:
+            bool: True if the radio button is disabled, False otherwise.
+        """
+        radio_index = getattr(self, f"_RADIO_{vegetable.upper()}")
+        logger.info(f"Checking if radio button {vegetable} is disabled")
+
+        return self.page.get_by_role("radio").nth(radio_index).is_disabled()
 
     def select_vegetable_radio(self, vegetable: str) -> None:
         """
-        Select a vegetable radio button when it is enabled.
+        Select a vegetable radio button.
 
         Args:
-            vegetable: Vegetable radio option to select.
-                Supported values: lettuce, cabbage, pumpkin.
-
-        Raises:
-            ValueError: If the vegetable name is invalid.
+            vegetable: The vegetable to select. Supported values are lettuce, cabbage, and pumpkin.
         """
-        normalized_vegetable = vegetable.lower()
-        logger.info("Selecting vegetable radio button: %s", normalized_vegetable)
+        radio_index = getattr(self, f"_RADIO_{vegetable.upper()}")
+        logger.info(f"Selecting vegetable radio button: {vegetable}")
 
-        vegetable_radio = self._get_vegetable_radio(normalized_vegetable)
+        radio_button = self.page.get_by_role("radio").nth(radio_index)
 
-        if vegetable_radio.is_disabled():
+        if not radio_button.is_disabled():
+            radio_button.check()
+        else:
             logger.warning(
-                "Vegetable radio button '%s' is disabled and cannot be selected",
-                normalized_vegetable,
+                f"Radio button {vegetable} is disabled and cannot be selected"
             )
-            return
-
-        vegetable_radio.check()
 
     def get_selected_vegetable_radio(self) -> str:
         """
         Get the selected vegetable radio button.
 
         Returns:
-            Selected vegetable value, or an empty string if none is selected.
+            str: The selected vegetable radio button or empty string if none is selected.
         """
         logger.info("Getting selected vegetable radio button")
 
-        for vegetable in self._VEGETABLE_RADIO_INDEXES:
-            if self._get_vegetable_radio(vegetable).is_checked():
+        vegetables = ["lettuce", "cabbage", "pumpkin"]
+
+        for vegetable in vegetables:
+            radio_index = getattr(self, f"_RADIO_{vegetable.upper()}")
+
+            if self.page.get_by_role("radio").nth(radio_index).is_checked():
                 return vegetable
 
         return ""
 
+    def get_fruit_dropdown_header(self) -> str:
+        """
+        Get the fruit dropdown section header text.
+
+        Returns:
+            str: The fruit dropdown section header text.
+        """
+        logger.info("Getting fruit dropdown header text")
+
+        header = self.page.get_by_role(
+            "heading",
+            name=self._FRUIT_DROPDOWN_HEADER,
+            exact=True,
+        )
+
+        text = header.text_content()
+        return text.strip() if text else ""
+
     def select_fruit(self, fruit: str) -> None:
         """
-        Select a fruit from the fruit dropdown.
+        Select a fruit from the dropdown.
 
         Args:
-            fruit: Fruit option value to select.
+            fruit: The fruit to select.
         """
-        logger.info("Selecting fruit: %s", fruit)
-        self.fruit_dropdown.select_option(value=fruit)
+        logger.info(f"Selecting fruit: {fruit}")
+
+        self.page.get_by_role("combobox").nth(self._FRUIT_DROPDOWN).select_option(
+            value=fruit,
+        )
 
     def get_selected_fruit(self) -> str:
         """
-        Get the selected fruit value.
+        Get the selected fruit.
 
         Returns:
-            Selected fruit option value.
+            str: The selected fruit.
         """
         logger.info("Getting selected fruit")
-        return self.fruit_dropdown.input_value()
+
+        return self.page.get_by_role("combobox").nth(
+            self._FRUIT_DROPDOWN,
+        ).input_value()
 
     def get_available_fruits(self) -> List[str]:
         """
-        Get all available fruit option values from the fruit dropdown.
+        Get all available fruits in the dropdown.
 
         Returns:
-            List of fruit option values.
+            List[str]: List of available fruits.
         """
         logger.info("Getting available fruits")
 
-        fruit_values: List[str] = []
-        options = self.fruit_dropdown.get_by_role("option").all()
+        fruit_dropdown = self.page.get_by_role("combobox").nth(self._FRUIT_DROPDOWN)
+        options = fruit_dropdown.get_by_role("option").all()
+
+        fruits = []
 
         for option in options:
             value = option.get_attribute("value")
-            if value is not None:
-                fruit_values.append(value)
+            if value:
+                fruits.append(value)
 
-        logger.info("Available fruits: %s", fruit_values)
-        return fruit_values
+        logger.info(f"Available fruits: {fruits}")
+
+        return fruits
 
     def take_screenshot(self, test_name: str, screenshot_name: str) -> str:
         """
         Take a screenshot of the current page state.
 
         Args:
-            test_name: Name of the test.
-            screenshot_name: Name for the screenshot.
+            test_name: The name of the test.
+            screenshot_name: The name for the screenshot.
 
         Returns:
-            Path to the saved screenshot.
+            str: The path to the saved screenshot.
         """
-        logger.info("Taking screenshot for test '%s': %s", test_name, screenshot_name)
-
         return ScreenshotUtils.take_screenshot(
             self.page,
             f"{test_name}_{screenshot_name}",
         )
 
-    def _get_checkbox(self, checkbox_number: int) -> Locator:
+    def is_disabled(self, selector: str, timeout: Optional[int] = None) -> bool:
         """
-        Get a checkbox locator by checkbox number.
+        Check if an element is disabled.
 
         Args:
-            checkbox_number: Checkbox number from 1 to 4.
+            selector: Selector for the element.
+            timeout: Optional timeout in milliseconds.
 
         Returns:
-            Playwright locator for the checkbox.
-
-        Raises:
-            ValueError: If the checkbox number is invalid.
+            bool: True if the element is disabled, False otherwise.
         """
-        if checkbox_number not in self._CHECKBOX_LABELS:
-            raise ValueError(
-                f"Invalid checkbox number '{checkbox_number}'. "
-                f"Supported values: {list(self._CHECKBOX_LABELS.keys())}"
-            )
+        try:
+            element = self.wait_for_selector(selector, timeout=timeout)
+            return element.is_disabled()
+        except Exception as e:
+            logger.error(f"Error checking if element is disabled: {str(e)}")
+            return False
 
-        return self.checkboxes.nth(checkbox_number - 1)
-
-    def _get_color_radio(self, color: str) -> Locator:
+    def get_option_values(self, selector: str, timeout: Optional[int] = None) -> List[str]:
         """
-        Get a color radio button locator by color name.
+        Get all option values from a dropdown.
 
         Args:
-            color: Color radio option.
-                Supported values: green, blue, yellow, orange, purple.
+            selector: Selector for the dropdown.
+            timeout: Optional timeout in milliseconds.
 
         Returns:
-            Playwright locator for the color radio button.
-
-        Raises:
-            ValueError: If the color is invalid.
+            List[str]: List of option values.
         """
-        if color not in self._COLOR_RADIO_INDEXES:
-            raise ValueError(
-                f"Invalid color radio option '{color}'. "
-                f"Supported values: {list(self._COLOR_RADIO_INDEXES.keys())}"
-            )
+        logger.info(f"Getting option values from dropdown: {selector}")
 
-        return self.radio_buttons.nth(self._COLOR_RADIO_INDEXES[color])
+        try:
+            dropdown = self.wait_for_selector(selector, timeout=timeout)
+            options = dropdown.query_selector_all("option")
 
-    def _get_vegetable_radio(self, vegetable: str) -> Locator:
+            values = []
+
+            for option in options:
+                value = option.get_attribute("value")
+                if value:
+                    values.append(value)
+
+            logger.info(f"Found options: {values}")
+
+            return values
+        except Exception as e:
+            logger.error(f"Error getting option values: {str(e)}")
+            return []
+
+    def get_selected_value(self, selector: str, timeout: Optional[int] = None) -> str:
         """
-        Get a vegetable radio button locator by vegetable name.
+        Get the selected value from a dropdown.
 
         Args:
-            vegetable: Vegetable radio option.
-                Supported values: lettuce, cabbage, pumpkin.
+            selector: Selector for the dropdown.
+            timeout: Optional timeout in milliseconds.
 
         Returns:
-            Playwright locator for the vegetable radio button.
-
-        Raises:
-            ValueError: If the vegetable name is invalid.
+            str: The selected option value.
         """
-        if vegetable not in self._VEGETABLE_RADIO_INDEXES:
-            raise ValueError(
-                f"Invalid vegetable radio option '{vegetable}'. "
-                f"Supported values: {list(self._VEGETABLE_RADIO_INDEXES.keys())}"
-            )
+        logger.info(f"Getting selected value from dropdown: {selector}")
 
-        return self.radio_buttons.nth(self._VEGETABLE_RADIO_INDEXES[vegetable])
+        try:
+            dropdown = self.wait_for_selector(selector, timeout=timeout)
+            value = dropdown.input_value()
 
-    @staticmethod
-    def _get_text_content(locator: Locator) -> str:
-        """
-        Get normalized DOM text content from a locator.
+            logger.info(f"Selected value: {value}")
 
-        This intentionally uses text_content instead of inner_text because
-        some headings on this demo page are visually transformed to uppercase.
-
-        Args:
-            locator: Playwright locator.
-
-        Returns:
-            Normalized text content, or an empty string if no text is found.
-        """
-        locator.wait_for(state="visible")
-        text = locator.text_content()
-        return text.strip() if text else ""
+            return value
+        except Exception as e:
+            logger.error(f"Error getting selected value: {str(e)}")
+            return ""
