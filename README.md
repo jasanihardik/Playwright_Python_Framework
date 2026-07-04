@@ -540,6 +540,42 @@ python -m pytest --browser chromium
 
 ---
 
+## Attribution
+
+This framework was created and maintained by **Hardik Jasani** as a portfolio project to demonstrate hands-on experience with:
+
+* Python
+* Playwright
+* Pytest
+* Page Object Model design
+* UI test automation
+* Test reporting
+* CI/CD with GitHub Actions
+
+If you use, fork, reference, or build upon this framework, please provide proper credit by linking back to the original repository:
+
+```text
+https://github.com/jasanihardik/Playwright_Python_Framework
+```
+
+## Security / Responsible Use
+
+This repository is public for portfolio and learning purposes.
+
+Please do not use this framework for unauthorized testing, scraping, load generation, security probing, or automation against websites where you do not have permission.
+
+Do not commit secrets, credentials, API keys, tokens, private environment files, or company/client-specific code to this repository.
+
 ## License
 
 This project is licensed under the MIT License.
+
+Copyright (c) 2026 Hardik Jasani
+
+You are free to use, modify, and distribute this project under the terms of the MIT License. If you use or reference this framework, please provide proper credit by linking back to the original repository:
+
+```text
+https://github.com/jasanihardik/Playwright_Python_Framework
+```
+
+See the [LICENSE](LICENSE) file for details.
