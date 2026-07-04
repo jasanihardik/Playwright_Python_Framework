@@ -46,6 +46,7 @@ jobs:
         run: |
           python -m pytest tests/test_cases \
             --browser chromium \
+            --headless true \
             --html=reports/playwright_report_chromium.html \
             --self-contained-html \
             -v
